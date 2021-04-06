@@ -146,12 +146,13 @@ jobs:
         fi
         echo ::set-output name=tag::${GITHUB_REF#refs/tags/}
         git log --pretty='format:%d%n- %s%n%b---' $(git tag --sort=v:refname | tail -n2 | head -n1)..HEAD > _CHANGES.md
-    - if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+    - if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags')
+      id: create_release
       uses: softprops/action-gh-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
       with:
-        name: tqdm ${{ steps.collect_assets.outputs.tag }} stable
+        release_name: tqdm ${{ github.ref }} stable
         body_path: _CHANGES.md
         draft: true
         files: |
